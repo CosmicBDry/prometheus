@@ -43,7 +43,7 @@ func main() {
 	//mysql存活探测指标注册
 	prometheus.MustRegister(mysql_up)
 
-	//mysql的增删改查查询统计指标注册
+	//mysql的增删改查统计指标注册
 	prometheus.MustRegister(command.NewCmdCollector(DB, mysqladdr))
 
 	//慢查询指标注册
@@ -52,7 +52,7 @@ func main() {
 	//最大连接和已连接指标注册
 	prometheus.MustRegister(connect.NewConnectCollector(DB, mysqladdr))
 
-	//所有查询包括show、select...等所有查询统计的Query指标注册
+	//所有查询包括show、select...等Query统计指标注册
 	prometheus.MustRegister(queriesAll.NewQeuryClollector(DB, mysqladdr))
 
 	//数据库已接收和已发送的流量统计注册
@@ -60,7 +60,7 @@ func main() {
 
 	//暴露指标，url与处理器关系绑定-------------------------------------------------------------------->
 	http.Handle("/metrics/", promhttp.Handler())
-
+	
 	//启动http服务监听-------------------------------------------------------------------------------->
 	http.ListenAndServe(addr, nil)
 
