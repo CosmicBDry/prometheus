@@ -10,9 +10,11 @@ import (
 	"github.com/CosmicBDry/prometheus/mysql_exporter/collectors/queriesAll"
 	"github.com/CosmicBDry/prometheus/mysql_exporter/collectors/slowquery"
 	"github.com/CosmicBDry/prometheus/mysql_exporter/collectors/traffic"
+	"github.com/CosmicBDry/prometheus/mysql_exporter/handlerAuth"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	//"golang.org/x/crypto/bcrypt"
 )
 
 func main() {
@@ -20,6 +22,9 @@ func main() {
 	addr := "localhost:9090"
 	mysqladdr := "192.168.30.32:3306/gocmdb"
 	DB, err := sql.Open("mysql", dsn)
+	user, password := "admin", "$2a$06$jIOwHrLCe6m0F96UZXHeee6sfy8GcGciWQgR6FAv8vOGdZ7mHw3Qq"//设置暴露访问认证
+	//password, _ := bcrypt.GenerateFromPassword([]byte("admin@123"), 6)//bcrypt密码加密，6次hash加密
+	//fmt.Println(string(password))
 
 	if err != nil {
 		log.Fatal(err)
@@ -59,8 +64,8 @@ func main() {
 	prometheus.MustRegister(traffic.NewTrafficCollector(DB, mysqladdr))
 
 	//暴露指标，url与处理器关系绑定-------------------------------------------------------------------->
-	http.Handle("/metrics/", promhttp.Handler())
-	
+	http.Handle("/metrics/", handlerAuth.Auth(promhttp.Handler(),   password}))
+
 	//启动http服务监听-------------------------------------------------------------------------------->
 	http.ListenAndServe(addr, nil)
 
