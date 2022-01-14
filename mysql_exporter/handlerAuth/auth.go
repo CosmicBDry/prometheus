@@ -33,7 +33,7 @@ func Auth(handler http.Handler, secrets AuthSecrets) http.Handler {
 //判断客户端发送的secret是否等于设置的secrets
 func IsAuth(secret string, secrets AuthSecrets) bool {
 
-	if secrets == nil { //若管理员不设置用户名及密码认证则直接返回true，则任何人均可访问，不设限制
+	if secrets == nil { //若管理员不设置认证直接返回true，则任何人均可访问，不设限制
 		return true
 	}
 
