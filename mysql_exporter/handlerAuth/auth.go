@@ -5,25 +5,27 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/siruspen/logrus"
 	"golang.org/x/crypto/bcrypt" ///bcrypt密码加密的hash运算
 )
 
 type AuthSecrets map[string]string //定义一个map类型，用于外部设置访问的user和password，是基于Prometheus的Basic认证类型
 
 //定义一个Auth函数，参数类型和返回值均为http.Handler接口类型---------------------------------------------------------------------->
-func Auth(handler http.Handler, secrets AuthSecrets) http.Handler {
+func Auth(handler http.Handler, secrets AuthSecrets, logger *logrus.Logger) http.Handler {
 
 	return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
 
 		secret := request.Header.Get("Authorization")
 
 		if !IsAuth(secret, secrets) {
+			logger.Error("basic_auth认证失败，请提供正确的用户名、密码或有效的api请求token")
 			response.Header().Set("WWW-Authenticate", `Basic realm=""`) //响应头设置Basic认证类型：Basic base64(user:password)，并弹出输入框
 			response.WriteHeader(401)                                   //状态码必须设置成401，才能弹出上面的Basic弹出框
-
 			return
 		}
-
+		logger.Info(request.Method, " ", "http://", request.Host, request.URL)
+		logger.Info("User-Agent: ", request.Header["User-Agent"], " ", "ClientAddr: ", "[", request.RemoteAddr, "]")
 		handler.ServeHTTP(response, request)
 
 	})
@@ -33,7 +35,7 @@ func Auth(handler http.Handler, secrets AuthSecrets) http.Handler {
 //判断客户端发送的secret是否等于设置的secrets
 func IsAuth(secret string, secrets AuthSecrets) bool {
 
-	if secrets == nil { //若管理员不设置认证直接返回true，则任何人均可访问，不设限制
+	if secrets == nil { //若管理员不设置用户名及密码认证则直接返回true，则任何人均可访问，不设限制
 		return true
 	}
 

@@ -8,7 +8,7 @@ import (
 
 //1.创建一个结构体CmdCollector，且定义Describe和Collect两个方法，使得满足prometheus.Collector接口中所有方法------------------------------------------>
 type CmdCollector struct {
-	Desc *prometheus.Desc
+	Desc *prometheus.Desc // 用于定义指标类型
 	Db   *sql.DB
 }
 

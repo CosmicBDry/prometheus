@@ -1,0 +1,28 @@
+---
+#被监控的mysql连接配置,统计数据库增删改查、总查询、慢查询，监控数据库进出流量、存活状态等...
+Mysql:
+  host: 0.0.0.0
+  port: 3306
+  db_user: "root"
+  db_password: "123456"
+
+#程序启动参数
+Web:
+  addr: "localhost:9898"
+  #定义访问认证
+  basic_auth:
+    username: "admin"
+    #通过启动命令./mysql_exporter -init "your password" 生成的密码hash，作为user_password的值
+    user_password: "$2a$06$6kefbPPoAPIDrWLXfhc/lOPCFnz5K6Lv31fBbZJXgk2fkHHZGILNi"
+
+#日志文件配置
+Logger:
+   file_path: "./logs/Mysql_Exporter.log"
+   #允许单个日志文件大小，单位为MB
+   log_file_max_size: 10
+   #保留最近的日志(n天)
+   log_retain_recent_days: 30
+   #历史日志文件名称是否以本地时间命名（true or false）,默认为false不启用，以UTC时间命名
+   log_backup_local_time: true
+   #是否对历史日志文件进行打包压缩（true or false），压缩格式为gzip
+   compress: true
